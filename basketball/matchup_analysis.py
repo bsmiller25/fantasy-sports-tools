@@ -9,15 +9,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def matchup_analysis(team_id, matchupPeriod=None):
-    league = bball.League(os.environ.get('BBALL_ID'), 2020, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'))
-
-    if not matchupPeriod:
-        matchupPeriod = league.currentMatchupPeriod
-
-    matchup = [i for i in league.scoreboard(matchupPeriod) if (i.home_team.team_id == team_id or
-                                                               i.away_team.team_id == team_id)][0]
-        
+def matchup_report(league, matchup): 
+    """Get projection for give matchup"""
+    matchupPeriod = matchup.matchupPeriod
+    
     # find the start scoring period
     match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
                    league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1))
@@ -59,7 +54,6 @@ def matchup_analysis(team_id, matchupPeriod=None):
                                          'FT%': {'score': 0},
                                          'FG%': {'score': 0},
                                          }
-
 
     for day in remaining_dates:
         sched = league._get_nba_schedule(day[0])
@@ -112,17 +106,58 @@ def matchup_analysis(team_id, matchupPeriod=None):
     away =  pd.DataFrame(proj_stats[matchup.away_team]).T
     final = pd.DataFrame({matchup.home_team: home['score'],
                           matchup.away_team: away['score']})
-    
-    print(final)
+    score_stats = ['PTS', 'REB', 'AST', 'STL', 'BLK', '3PTM', 'FG%', 'FT%', '-TO']
+    home_score = 0
+    for stat in score_stats:
+        # for stats you want a lot of
+        if stat[0] != '-':
+            comp = final.loc[stat, :]
+            if comp[0] > comp[1]:
+                home_score += 1
+            elif comp[0] == comp[1]:
+                home_score += 0.5
+        # for stats you want less of
+        else:
+            comp = final.loc[stat[1:], :]
+            if comp[0] < comp[1]:
+                home_score += 1
+            elif comp[0] == comp[1]:
+                home_score += 0.5
+    final = final.append(pd.DataFrame({comp.index[0]: home_score, comp.index[1]: 9 - home_score}, index=['Score']))    
+
+    return(final)
+
+def matchup_analysis(team_id=None, matchupPeriod=None):
+    """Get a matchup report or matchup reports"""
+    league = bball.League(os.environ.get('BBALL_ID'), 2020, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'))
+
+    if not matchupPeriod:
+        matchupPeriod = league.currentMatchupPeriod
+
+    if team_id:
+        matchup = [i for i in league.scoreboard(matchupPeriod) if (i.home_team.team_id == team_id or
+                                                                   i.away_team.team_id == team_id)][0]
+        matchup.matchupPeriod = matchupPeriod
+        report = matchup_report(league, matchup)
+        
+        print(report)
+    else:
+        for matchup in league.scoreboard(matchupPeriod):
+            matchup.matchupPeriod = matchupPeriod
+            report = matchup_report(league, matchup)
+            print(report)
         
 
 if __name__ == '__main__':
 
-    team_id = 3
     matchupPeriod = None
+    team_id = None
+    
+    if len(sys.argv) >= 2:
+        matchupPeriod = int(sys.argv[1])
 
-    if len(sys.argv) > 1:
-        team_id = int(sys.argv[1])
-        matchupPeriod = int(sys.argv[2])
+    if len(sys.argv) >= 3:
+        team_id = int(sys.argv[2])
+        
             
-    matchup_analysis(team_id=team_id, matchupPeriod=matchupPeriod)    
+    matchup_analysis(matchupPeriod=matchupPeriod, team_id=team_id)    
