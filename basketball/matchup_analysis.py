@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def matchup_report(league, matchup): 
+def matchup_projection(league, matchup): 
     """Get projection for give matchup"""
     matchupPeriod = matchup.matchupPeriod
     
@@ -127,7 +127,7 @@ def matchup_report(league, matchup):
 
     return(final)
 
-def matchup_analysis(team_id=None, matchupPeriod=None):
+def week_analysis(team_id=None, matchupPeriod=None, verbose=False):
     """Get a matchup report or matchup reports"""
     league = bball.League(os.environ.get('BBALL_ID'), 2020, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'))
 
@@ -138,14 +138,18 @@ def matchup_analysis(team_id=None, matchupPeriod=None):
         matchup = [i for i in league.scoreboard(matchupPeriod) if (i.home_team.team_id == team_id or
                                                                    i.away_team.team_id == team_id)][0]
         matchup.matchupPeriod = matchupPeriod
-        report = matchup_report(league, matchup)
-        
-        print(report)
+        report = matchup_projection(league, matchup)
+        if verbose: print(report)
+        reports = [report]
     else:
+        reports = []
         for matchup in league.scoreboard(matchupPeriod):
             matchup.matchupPeriod = matchupPeriod
-            report = matchup_report(league, matchup)
-            print(report)
+            report = matchup_projection(league, matchup)
+            if verbose: print(report)
+            reports.append(report)
+
+    return(reports)
         
 
 if __name__ == '__main__':
@@ -159,5 +163,7 @@ if __name__ == '__main__':
     if len(sys.argv) >= 3:
         team_id = int(sys.argv[2])
         
-            
-    matchup_analysis(matchupPeriod=matchupPeriod, team_id=team_id)    
+    week_analysis(matchupPeriod=matchupPeriod,
+                  team_id=team_id,
+                  verbose=True)    
+
