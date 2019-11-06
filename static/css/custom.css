@@ -1,0 +1,12 @@
+.matchup-table {
+    width: 80%;
+}
+
+.matchup-table td {
+    width: 40%;
+    text-align: center;
+}
+
+.matchup-table tr th {
+    width: 10%;
+}

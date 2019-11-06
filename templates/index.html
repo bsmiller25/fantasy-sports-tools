@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Fantasy Sports Tools{% endblock %}
+
+{% block content %}
+    <h1>Fantasy Sports Tools</h1>
+    <h2>Current Matchup Projections</h2>
+
+    {% for matchup in matchups %}
+	{{ matchup|safe }}
+	<hr>
+    {% endfor %}
+
+    
+{% endblock %}
