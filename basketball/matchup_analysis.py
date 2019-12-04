@@ -63,18 +63,18 @@ def matchup_projection(league, matchup):
             if player.injuryStatus == 'OUT':
                 continue
             if player.proTeam in sched.keys():
-                if '002020' in player.stats.keys():
-                    proj_stats[matchup.home_team]['PTS']['score'] += player.stats['002020']['avg']['PTS']
-                    proj_stats[matchup.home_team]['REB']['score'] += player.stats['002020']['avg']['REB']
-                    proj_stats[matchup.home_team]['AST']['score'] += player.stats['002020']['avg']['AST']
-                    proj_stats[matchup.home_team]['STL']['score'] += player.stats['002020']['avg']['STL']
-                    proj_stats[matchup.home_team]['BLK']['score'] += player.stats['002020']['avg']['BLK']
-                    proj_stats[matchup.home_team]['3PTM']['score'] += player.stats['002020']['avg']['3PTM']
-                    proj_stats[matchup.home_team]['TO']['score'] += player.stats['002020']['avg']['TO']
-                    proj_stats[matchup.home_team]['FTM']['score'] += player.stats['002020']['avg']['FTM']
-                    proj_stats[matchup.home_team]['FTA']['score'] += player.stats['002020']['avg']['FTA']
-                    proj_stats[matchup.home_team]['FGM']['score'] += player.stats['002020']['avg']['FGM']
-                    proj_stats[matchup.home_team]['FGA']['score'] += player.stats['002020']['avg']['FGA']
+                if '022020' in player.stats.keys():
+                    proj_stats[matchup.home_team]['PTS']['score'] += player.stats['022020']['avg']['PTS']
+                    proj_stats[matchup.home_team]['REB']['score'] += player.stats['022020']['avg']['REB']
+                    proj_stats[matchup.home_team]['AST']['score'] += player.stats['022020']['avg']['AST']
+                    proj_stats[matchup.home_team]['STL']['score'] += player.stats['022020']['avg']['STL']
+                    proj_stats[matchup.home_team]['BLK']['score'] += player.stats['022020']['avg']['BLK']
+                    proj_stats[matchup.home_team]['3PTM']['score'] += player.stats['022020']['avg']['3PTM']
+                    proj_stats[matchup.home_team]['TO']['score'] += player.stats['022020']['avg']['TO']
+                    proj_stats[matchup.home_team]['FTM']['score'] += player.stats['022020']['avg']['FTM']
+                    proj_stats[matchup.home_team]['FTA']['score'] += player.stats['022020']['avg']['FTA']
+                    proj_stats[matchup.home_team]['FGM']['score'] += player.stats['022020']['avg']['FGM']
+                    proj_stats[matchup.home_team]['FGA']['score'] += player.stats['022020']['avg']['FGA']
                     proj_stats[matchup.home_team]['FT%']['score'] = (proj_stats[matchup.home_team]['FTM']['score'] /
                                                                      proj_stats[matchup.home_team]['FTA']['score'])
                     proj_stats[matchup.home_team]['FG%']['score'] = (proj_stats[matchup.home_team]['FGM']['score'] /
@@ -84,18 +84,18 @@ def matchup_projection(league, matchup):
             if player.injuryStatus == 'OUT':
                 continue
             if player.proTeam in sched.keys():
-                if '002020' in player.stats.keys():
-                    proj_stats[matchup.away_team]['PTS']['score'] += player.stats['002020']['avg']['PTS']
-                    proj_stats[matchup.away_team]['REB']['score'] += player.stats['002020']['avg']['REB']
-                    proj_stats[matchup.away_team]['AST']['score'] += player.stats['002020']['avg']['AST']
-                    proj_stats[matchup.away_team]['STL']['score'] += player.stats['002020']['avg']['STL']
-                    proj_stats[matchup.away_team]['BLK']['score'] += player.stats['002020']['avg']['BLK']
-                    proj_stats[matchup.away_team]['3PTM']['score'] += player.stats['002020']['avg']['3PTM']
-                    proj_stats[matchup.away_team]['TO']['score'] += player.stats['002020']['avg']['TO']
-                    proj_stats[matchup.away_team]['FTM']['score'] += player.stats['002020']['avg']['FTM']
-                    proj_stats[matchup.away_team]['FTA']['score'] += player.stats['002020']['avg']['FTA']
-                    proj_stats[matchup.away_team]['FGM']['score'] += player.stats['002020']['avg']['FGM']
-                    proj_stats[matchup.away_team]['FGA']['score'] += player.stats['002020']['avg']['FGA']
+                if '022020' in player.stats.keys():
+                    proj_stats[matchup.away_team]['PTS']['score'] += player.stats['022020']['avg']['PTS']
+                    proj_stats[matchup.away_team]['REB']['score'] += player.stats['022020']['avg']['REB']
+                    proj_stats[matchup.away_team]['AST']['score'] += player.stats['022020']['avg']['AST']
+                    proj_stats[matchup.away_team]['STL']['score'] += player.stats['022020']['avg']['STL']
+                    proj_stats[matchup.away_team]['BLK']['score'] += player.stats['022020']['avg']['BLK']
+                    proj_stats[matchup.away_team]['3PTM']['score'] += player.stats['022020']['avg']['3PTM']
+                    proj_stats[matchup.away_team]['TO']['score'] += player.stats['022020']['avg']['TO']
+                    proj_stats[matchup.away_team]['FTM']['score'] += player.stats['022020']['avg']['FTM']
+                    proj_stats[matchup.away_team]['FTA']['score'] += player.stats['022020']['avg']['FTA']
+                    proj_stats[matchup.away_team]['FGM']['score'] += player.stats['022020']['avg']['FGM']
+                    proj_stats[matchup.away_team]['FGA']['score'] += player.stats['022020']['avg']['FGA']
                     proj_stats[matchup.away_team]['FT%']['score'] = (proj_stats[matchup.away_team]['FTM']['score'] /
                                                                      proj_stats[matchup.away_team]['FTA']['score'])
                     proj_stats[matchup.away_team]['FG%']['score'] = (proj_stats[matchup.away_team]['FGM']['score'] /
