@@ -4,15 +4,22 @@ import sys
 import pandas as pd
 import pdb
 import espn_api.basketball as bball
+import argparse
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 load_dotenv()
 
 
-def matchup_projection(league, matchup): 
+def matchup_projection(league, matchup, stats): 
     """Get projection for give matchup"""
     matchupPeriod = matchup.matchupPeriod
-    
+
+    if stats=='last30': stats='032020'
+    if stats=='last15': stats='022020'
+    if stats=='last7': stats='012020'
+    if stats=='season': stats='002020'
+    if stats=='proj': stats='102020'
+
     # find the start scoring period
     match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
                    league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1))
@@ -58,49 +65,34 @@ def matchup_projection(league, matchup):
     for day in remaining_dates:
         sched = league._get_nba_schedule(day[0])
 
-        # update home team projected stats
-        for player in matchup.home_team.roster:
-            if player.injuryStatus == 'OUT':
-                continue
-            if player.proTeam in sched.keys():
-                if '032020' in player.stats.keys():
-                    proj_stats[matchup.home_team]['PTS']['score'] += player.stats['032020']['avg']['PTS']
-                    proj_stats[matchup.home_team]['REB']['score'] += player.stats['032020']['avg']['REB']
-                    proj_stats[matchup.home_team]['AST']['score'] += player.stats['032020']['avg']['AST']
-                    proj_stats[matchup.home_team]['STL']['score'] += player.stats['032020']['avg']['STL']
-                    proj_stats[matchup.home_team]['BLK']['score'] += player.stats['032020']['avg']['BLK']
-                    proj_stats[matchup.home_team]['3PTM']['score'] += player.stats['032020']['avg']['3PTM']
-                    proj_stats[matchup.home_team]['TO']['score'] += player.stats['032020']['avg']['TO']
-                    proj_stats[matchup.home_team]['FTM']['score'] += player.stats['032020']['avg']['FTM']
-                    proj_stats[matchup.home_team]['FTA']['score'] += player.stats['032020']['avg']['FTA']
-                    proj_stats[matchup.home_team]['FGM']['score'] += player.stats['032020']['avg']['FGM']
-                    proj_stats[matchup.home_team]['FGA']['score'] += player.stats['032020']['avg']['FGA']
-                    proj_stats[matchup.home_team]['FT%']['score'] = (proj_stats[matchup.home_team]['FTM']['score'] /
-                                                                     proj_stats[matchup.home_team]['FTA']['score'])
-                    proj_stats[matchup.home_team]['FG%']['score'] = (proj_stats[matchup.home_team]['FGM']['score'] /
-                                                                     proj_stats[matchup.home_team]['FGA']['score'])
-        # update away team projected stats
-        for player in matchup.away_team.roster:
-            if player.injuryStatus == 'OUT':
-                continue
-            if player.proTeam in sched.keys():
-                if '032020' in player.stats.keys():
-                    proj_stats[matchup.away_team]['PTS']['score'] += player.stats['032020']['avg']['PTS']
-                    proj_stats[matchup.away_team]['REB']['score'] += player.stats['032020']['avg']['REB']
-                    proj_stats[matchup.away_team]['AST']['score'] += player.stats['032020']['avg']['AST']
-                    proj_stats[matchup.away_team]['STL']['score'] += player.stats['032020']['avg']['STL']
-                    proj_stats[matchup.away_team]['BLK']['score'] += player.stats['032020']['avg']['BLK']
-                    proj_stats[matchup.away_team]['3PTM']['score'] += player.stats['032020']['avg']['3PTM']
-                    proj_stats[matchup.away_team]['TO']['score'] += player.stats['032020']['avg']['TO']
-                    proj_stats[matchup.away_team]['FTM']['score'] += player.stats['032020']['avg']['FTM']
-                    proj_stats[matchup.away_team]['FTA']['score'] += player.stats['032020']['avg']['FTA']
-                    proj_stats[matchup.away_team]['FGM']['score'] += player.stats['032020']['avg']['FGM']
-                    proj_stats[matchup.away_team]['FGA']['score'] += player.stats['032020']['avg']['FGA']
-                    proj_stats[matchup.away_team]['FT%']['score'] = (proj_stats[matchup.away_team]['FTM']['score'] /
-                                                                     proj_stats[matchup.away_team]['FTA']['score'])
-                    proj_stats[matchup.away_team]['FG%']['score'] = (proj_stats[matchup.away_team]['FGM']['score'] /
-                                                                     proj_stats[matchup.away_team]['FGA']['score'])
-                    
+        for team in [matchup.home_team, matchup.away_team]:
+            for player in team.roster:
+                if player.injuryStatus == 'OUT':
+                    continue
+                if player.proTeam in sched.keys():
+                    if stats in player.stats.keys():
+                        proj_stats[team]['PTS']['score'] += player.stats[stats]['avg']['PTS']
+                        proj_stats[team]['REB']['score'] += player.stats[stats]['avg']['REB']
+                        proj_stats[team]['AST']['score'] += player.stats[stats]['avg']['AST']
+                        proj_stats[team]['STL']['score'] += player.stats[stats]['avg']['STL']
+                        proj_stats[team]['BLK']['score'] += player.stats[stats]['avg']['BLK']
+                        proj_stats[team]['3PTM']['score'] += player.stats[stats]['avg']['3PTM']
+                        proj_stats[team]['TO']['score'] += player.stats[stats]['avg']['TO']
+                        proj_stats[team]['FTM']['score'] += player.stats[stats]['avg']['FTM']
+                        proj_stats[team]['FTA']['score'] += player.stats[stats]['avg']['FTA']
+                        proj_stats[team]['FGM']['score'] += player.stats[stats]['avg']['FGM']
+                        proj_stats[team]['FGA']['score'] += player.stats[stats]['avg']['FGA']
+                        try:
+                            proj_stats[team]['FT%']['score'] = (proj_stats[team]['FTM']['score'] /
+                                                                         proj_stats[team]['FTA']['score'])
+                        except ZeroDivisionError:
+                            proj_stats[team]['FT%']['score'] = 0
+                        try:
+                            proj_stats[team]['FG%']['score'] = (proj_stats[team]['FGM']['score'] /
+                                                                         proj_stats[team]['FGA']['score'])
+                        except ZeroDivisionError:
+                            proj_stats[team]['FG%']['score'] = 0
+                            
     # display
     home = pd.DataFrame(proj_stats[matchup.home_team]).T
     away =  pd.DataFrame(proj_stats[matchup.away_team]).T
@@ -127,7 +119,7 @@ def matchup_projection(league, matchup):
 
     return(final)
 
-def week_analysis(team_id=None, matchupPeriod=None, verbose=False):
+def week_analysis(team_id=None, matchupPeriod=None, stats='season', verbose=False):
     """Get a matchup report or matchup reports"""
     league = bball.League(os.environ.get('BBALL_ID'), 2020, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'))
 
@@ -138,14 +130,14 @@ def week_analysis(team_id=None, matchupPeriod=None, verbose=False):
         matchup = [i for i in league.scoreboard(matchupPeriod) if (i.home_team.team_id == team_id or
                                                                    i.away_team.team_id == team_id)][0]
         matchup.matchupPeriod = matchupPeriod
-        report = matchup_projection(league, matchup)
+        report = matchup_projection(league, matchup, stats)
         if verbose: print(report)
         reports = [report]
     else:
         reports = []
         for matchup in league.scoreboard(matchupPeriod):
             matchup.matchupPeriod = matchupPeriod
-            report = matchup_projection(league, matchup)
+            report = matchup_projection(league, matchup, stats)
             if verbose: print(report)
             reports.append(report)
 
@@ -154,16 +146,15 @@ def week_analysis(team_id=None, matchupPeriod=None, verbose=False):
 
 if __name__ == '__main__':
 
-    matchupPeriod = None
-    team_id = None
-    
-    if len(sys.argv) >= 2:
-        matchupPeriod = int(sys.argv[1])
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--period', '-p', help='matchup period', type=int, default=None)
+    parser.add_argument('--team', '-t', help='team id', type=int, default=None)
+    parser.add_argument('--stats', '-s', help='stats', type=str, default='season')
 
-    if len(sys.argv) >= 3:
-        team_id = int(sys.argv[2])
-        
-    week_analysis(matchupPeriod=matchupPeriod,
-                  team_id=team_id,
+    args = parser.parse_args()
+    
+    week_analysis(matchupPeriod=args.period,
+                  team_id=args.team,
+                  stats=args.stats,
                   verbose=True)    
 
