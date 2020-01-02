@@ -96,8 +96,8 @@ def matchup_projection(league, matchup, stats):
     # display
     home = pd.DataFrame(proj_stats[matchup.home_team]).T
     away =  pd.DataFrame(proj_stats[matchup.away_team]).T
-    final = pd.DataFrame({matchup.home_team: home['score'],
-                          matchup.away_team: away['score']})
+    final = pd.DataFrame({matchup.home_team.team_abbrev: home['score'],
+                          matchup.away_team.team_abbrev: away['score']})
     score_stats = ['PTS', 'REB', 'AST', 'STL', 'BLK', '3PTM', 'FG%', 'FT%', '-TO']
     home_score = 0
     for stat in score_stats:
