@@ -5,9 +5,11 @@ import pandas as pd
 import pdb
 import espn_api.basketball as bball
 import argparse
-from datetime import datetime, timedelta
+import pickle
+from datetime import date, datetime, timedelta
 from dotenv import load_dotenv
 load_dotenv()
+import pdb
 
 
 def matchup_projection(league, matchup, stats): 
@@ -23,9 +25,19 @@ def matchup_projection(league, matchup, stats):
     # find the start scoring period
     match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
                    league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1))
+
+    match_start = (126, date(2020, 2, 24))
+
+    if matchupPeriod == 19:
+        match_start = (133, date(2020, 3, 2))
+    if matchupPeriod == 20:
+        match_start = (147, date(2020, 3, 16))
+            
+    
     match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(7))]
-    
-    
+    if matchupPeriod in [19, 20]:
+        match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(14))]
+
     remaining_dates = [md for md in match_dates if md[1] >= datetime.today().date()]
 
     proj_stats = {}
@@ -121,7 +133,22 @@ def matchup_projection(league, matchup, stats):
 
 def week_analysis(team_id=None, matchupPeriod=None, stats='season', verbose=False):
     """Get a matchup report or matchup reports"""
-    league = bball.League(os.environ.get('BBALL_ID'), 2020, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'))
+
+    # check for existing pickled cookies
+    try:
+        fileObj = open('cookies.pkl', 'rb')
+        cookies = pickle.load(fileObj)
+    except:
+        cookies = False
+
+    if cookies:
+        try:
+            league = bball.League(os.environ.get('BBALL_ID'), 2020, espn_s2=cookies['espn_s2'], swid=cookies['swid'])
+        except:
+            cookies = False
+
+    if not cookies:
+        league = bball.League(os.environ.get('BBALL_ID'), 2020, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'), save_cookies=True)
 
     if not matchupPeriod:
         matchupPeriod = league.currentMatchupPeriod
