@@ -16,32 +16,28 @@ def matchup_projection(league, matchup, stats):
     """Get projection for give matchup"""
     matchupPeriod = matchup.matchupPeriod
 
-    if stats=='last30': stats='032020'
-    if stats=='last15': stats='022020'
-    if stats=='last7': stats='012020'
-    if stats=='season': stats='002020'
-    if stats=='proj': stats='102020'
+    if stats=='last30': stats='032021'
+    if stats=='last15': stats='022021'
+    if stats=='last7': stats='012021'
+    if stats=='season': stats='002021'
+    if stats=='proj': stats='102021'
 
     # find the start scoring period
-    match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
-                   league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1))
+    # match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
+    #                league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1))
 
-    match_start = (126, date(2020, 2, 24))
+    match_start = (int(league.scoringPeriodId/7) * 7,
+                   league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=int(league.scoringPeriodId/7)))
 
-    if matchupPeriod == 19:
-        match_start = (133, date(2020, 3, 2))
-    if matchupPeriod == 20:
-        match_start = (147, date(2020, 3, 16))
-            
-    
     match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(7))]
     if matchupPeriod in [19, 20]:
         match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(14))]
-
+        
     remaining_dates = [md for md in match_dates if md[1] >= datetime.today().date()]
 
     proj_stats = {}
     if matchup.home_team_cats:
+
         proj_stats[matchup.home_team] = matchup.home_team_cats
         proj_stats[matchup.away_team] = matchup.away_team_cats
     else:
@@ -88,7 +84,10 @@ def matchup_projection(league, matchup, stats):
                         proj_stats[team]['AST']['score'] += player.stats[stats]['avg']['AST']
                         proj_stats[team]['STL']['score'] += player.stats[stats]['avg']['STL']
                         proj_stats[team]['BLK']['score'] += player.stats[stats]['avg']['BLK']
-                        proj_stats[team]['3PTM']['score'] += player.stats[stats]['avg']['3PTM']
+                        try:
+                            proj_stats[team]['3PTM']['score'] += player.stats[stats]['avg']['3PTM']
+                        except KeyError:
+                            proj_stats[team]['3PTM']['score'] += 0
                         proj_stats[team]['TO']['score'] += player.stats[stats]['avg']['TO']
                         proj_stats[team]['FTM']['score'] += player.stats[stats]['avg']['FTM']
                         proj_stats[team]['FTA']['score'] += player.stats[stats]['avg']['FTA']
@@ -143,12 +142,12 @@ def week_analysis(team_id=None, matchupPeriod=None, stats='season', verbose=Fals
 
     if cookies:
         try:
-            league = bball.League(os.environ.get('BBALL_ID'), 2020, espn_s2=cookies['espn_s2'], swid=cookies['swid'])
+            league = bball.League(os.environ.get('BBALL_ID'), 2021, espn_s2=cookies['espn_s2'], swid=cookies['swid'])
         except:
             cookies = False
 
     if not cookies:
-        league = bball.League(os.environ.get('BBALL_ID'), 2020, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'), save_cookies=True)
+        league = bball.League(os.environ.get('BBALL_ID'), 2021, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'), save_cookies=True)
 
     if not matchupPeriod:
         matchupPeriod = league.currentMatchupPeriod
