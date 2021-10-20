@@ -16,21 +16,21 @@ def matchup_projection(league, matchup, stats):
     """Get projection for give matchup"""
     matchupPeriod = matchup.matchupPeriod
 
-    if stats=='last30': stats='032021'
-    if stats=='last15': stats='022021'
-    if stats=='last7': stats='012021'
-    if stats=='season': stats='002021'
-    if stats=='proj': stats='102021'
+    if stats=='last30': stats='032022'
+    if stats=='last15': stats='022022'
+    if stats=='last7': stats='012022'
+    if stats=='season': stats='002022'
+    if stats=='proj': stats='102022'
 
     # find the start scoring period
-    # match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
-    #                league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1))
+    match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
+                   league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1))
 
-    match_start = (int(league.scoringPeriodId/7) * 7,
-                   league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=int(league.scoringPeriodId/7)))
+   # match_start = (int(league.scoringPeriodId/7) * 7,
+   #                league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=int(league.scoringPeriodId/7)))
 
     match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(7))]
-    if matchupPeriod in [19, 20]:
+    if matchupPeriod in [17, 18]:
         match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(14))]
         
     remaining_dates = [md for md in match_dates if md[1] >= datetime.today().date()]
@@ -141,13 +141,11 @@ def week_analysis(team_id=None, matchupPeriod=None, stats='season', verbose=Fals
         cookies = False
 
     if cookies:
-        try:
-            league = bball.League(os.environ.get('BBALL_ID'), 2021, espn_s2=cookies['espn_s2'], swid=cookies['swid'])
-        except:
-            cookies = False
+        league = bball.League(os.environ.get('BBALL_ID'), 2022, espn_s2=cookies['espn_s2'], swid=cookies['swid'])
+
 
     if not cookies:
-        league = bball.League(os.environ.get('BBALL_ID'), 2021, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'), save_cookies=True)
+        league = bball.League(os.environ.get('BBALL_ID'), 2022, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'), save_cookies=True)
 
     if not matchupPeriod:
         matchupPeriod = league.currentMatchupPeriod

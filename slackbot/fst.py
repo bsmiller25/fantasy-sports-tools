@@ -4,6 +4,7 @@ import datetime
 import slack
 import pandas as pd
 from tabulate import tabulate
+import pdb
 
 sys.path.append('.')
 from basketball import matchup_analysis
@@ -11,7 +12,7 @@ from basketball import matchup_analysis
 client = slack.WebClient(token=os.environ.get('SLACK_TOKEN'))
 
 # also requires 'BBALL_ID', 'ESPN_USER', and 'ESPN_PW' env vars
-proj = matchup_analysis.week_analysis(stats='last15', verbose=False)
+proj = matchup_analysis.week_analysis(stats='proj', verbose=False)
 
 if datetime.datetime.now().time() < datetime.time(11):
     parent = client.chat_postMessage(
