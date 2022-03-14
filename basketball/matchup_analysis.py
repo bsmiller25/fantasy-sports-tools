@@ -23,16 +23,41 @@ def matchup_projection(league, matchup, stats):
     if stats=='proj': stats='102022'
 
     # find the start scoring period
-    match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
-                   league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1))
+    
+    # pre all star
+    if matchupPeriod < 18:
+        match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
+                       league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1)) 
+        
+        match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(7))]
 
-   # match_start = (int(league.scoringPeriodId/7) * 7,
-   #                league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=int(league.scoringPeriodId/7)))
-
-    match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(7))]
-    if matchupPeriod in [17, 18]:
+    # all star week
+    if matchupPeriod == 18:
+        match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
+                       league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1)) 
+        
         match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(14))]
         
+        # post all star
+    elif matchupPeriod > 18 and matchupPeriod < 20:
+        match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod),
+                       league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod)) 
+        
+        match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(7))]
+
+    # round one playoffs   
+    elif matchupPeriod == 20:
+        match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod),
+                       league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod))    
+        
+        match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(14))]
+
+    elif matchupPeriod == 21:
+        match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod + 1),
+                       league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod + 1))    
+        
+        match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(14))]
+    
     remaining_dates = [md for md in match_dates if md[1] >= datetime.today().date()]
 
     proj_stats = {}
@@ -83,7 +108,10 @@ def matchup_projection(league, matchup, stats):
                         proj_stats[team]['REB']['score'] += player.stats[stats]['avg']['REB']
                         proj_stats[team]['AST']['score'] += player.stats[stats]['avg']['AST']
                         proj_stats[team]['STL']['score'] += player.stats[stats]['avg']['STL']
-                        proj_stats[team]['BLK']['score'] += player.stats[stats]['avg']['BLK']
+                        try:
+                            proj_stats[team]['BLK']['score'] += player.stats[stats]['avg']['BLK']
+                        except KeyError:
+                            proj_stats[team]['BLK']['score'] += 0
                         try:
                             proj_stats[team]['3PTM']['score'] += player.stats[stats]['avg']['3PTM']
                         except KeyError:
@@ -142,7 +170,6 @@ def week_analysis(team_id=None, matchupPeriod=None, stats='season', verbose=Fals
 
     if cookies:
         league = bball.League(os.environ.get('BBALL_ID'), 2022, espn_s2=cookies['espn_s2'], swid=cookies['swid'])
-
 
     if not cookies:
         league = bball.League(os.environ.get('BBALL_ID'), 2022, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'), save_cookies=True)
