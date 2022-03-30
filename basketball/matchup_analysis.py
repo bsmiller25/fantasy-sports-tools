@@ -102,6 +102,8 @@ def matchup_projection(league, matchup, stats):
             for player in team.roster:
                 if player.injuryStatus == 'OUT':
                     continue
+                if player.lineupSlot == 'IR':
+                    continue
                 if player.proTeam in sched.keys():
                     if stats in player.stats.keys():
                         proj_stats[team]['PTS']['score'] += player.stats[stats]['avg']['PTS']
