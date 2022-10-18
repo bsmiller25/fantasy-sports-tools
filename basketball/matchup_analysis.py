@@ -9,51 +9,50 @@ import pickle
 from datetime import date, datetime, timedelta
 from dotenv import load_dotenv
 load_dotenv()
-import pdb
 
 
 def matchup_projection(league, matchup, stats): 
     """Get projection for give matchup"""
     matchupPeriod = matchup.matchupPeriod
 
-    if stats=='last30': stats='032022'
-    if stats=='last15': stats='022022'
-    if stats=='last7': stats='012022'
-    if stats=='season': stats='002022'
-    if stats=='proj': stats='102022'
+    if stats=='last30': stats='032023'
+    if stats=='last15': stats='022023'
+    if stats=='last7': stats='012023'
+    if stats=='season': stats='002023'
+    if stats=='proj': stats='102023'
 
     # find the start scoring period
     
-    # pre all star
+    # pre all star        
     if matchupPeriod < 18:
-        match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
+        match_start = (2 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
                        league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1)) 
         
         match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(7))]
 
     # all star week
     if matchupPeriod == 18:
-        match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
+        match_start = (2 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
                        league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1)) 
         
         match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(14))]
         
         # post all star
     elif matchupPeriod > 18 and matchupPeriod < 20:
-        match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod),
+        match_start = (2 - league.start_date.weekday() + 7 * (matchupPeriod),
                        league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod)) 
         
         match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(7))]
 
     # round one playoffs   
     elif matchupPeriod == 20:
-        match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod),
+        match_start = (2 - league.start_date.weekday() + 7 * (matchupPeriod),
                        league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod))    
         
         match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(14))]
 
     elif matchupPeriod == 21:
-        match_start = (1 - league.start_date.weekday() + 7 * (matchupPeriod + 1),
+        match_start = (2 - league.start_date.weekday() + 7 * (matchupPeriod + 1),
                        league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod + 1))    
         
         match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(14))]
@@ -61,6 +60,7 @@ def matchup_projection(league, matchup, stats):
     remaining_dates = [md for md in match_dates if md[1] >= datetime.today().date()]
 
     proj_stats = {}
+
     if matchup.home_team_cats:
 
         proj_stats[matchup.home_team] = matchup.home_team_cats
@@ -156,7 +156,7 @@ def matchup_projection(league, matchup, stats):
                 home_score += 1
             elif comp[0] == comp[1]:
                 home_score += 0.5
-    final = final.append(pd.DataFrame({comp.index[0]: home_score, comp.index[1]: 9 - home_score}, index=['Score']))    
+    final = pd.concat([final, pd.DataFrame({comp.index[0]: home_score, comp.index[1]: 9 - home_score}, index=['Score'])])    
 
     return(final)
 
@@ -171,10 +171,10 @@ def week_analysis(team_id=None, matchupPeriod=None, stats='season', verbose=Fals
         cookies = False
 
     if cookies:
-        league = bball.League(os.environ.get('BBALL_ID'), 2022, espn_s2=cookies['espn_s2'], swid=cookies['swid'])
+        league = bball.League(os.environ.get('BBALL_ID'), 2023, espn_s2=cookies['espn_s2'], swid=cookies['swid'])
 
     if not cookies:
-        league = bball.League(os.environ.get('BBALL_ID'), 2022, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'), save_cookies=True)
+        league = bball.League(os.environ.get('BBALL_ID'), 2023, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'), save_cookies=True)
 
     if not matchupPeriod:
         matchupPeriod = league.currentMatchupPeriod
@@ -202,7 +202,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--period', '-p', help='matchup period', type=int, default=None)
     parser.add_argument('--team', '-t', help='team id', type=int, default=None)
-    parser.add_argument('--stats', '-s', help='stats', type=str, default='season')
+    parser.add_argument('--stats', '-s', help='stats', type=str, default='proj')
 
     args = parser.parse_args()
     
