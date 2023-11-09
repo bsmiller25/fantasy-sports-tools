@@ -15,11 +15,11 @@ def matchup_projection(league, matchup, stats):
     """Get projection for give matchup"""
     matchupPeriod = matchup.matchupPeriod
 
-    if stats=='last30': stats='032023'
-    if stats=='last15': stats='022023'
-    if stats=='last7': stats='012023'
-    if stats=='season': stats='002023'
-    if stats=='proj': stats='102023'
+    if stats=='last30': stats='032024'
+    if stats=='last15': stats='022024'
+    if stats=='last7': stats='012024'
+    if stats=='season': stats='002024'
+    if stats=='proj': stats='102024'
 
     # find the start scoring period
     
@@ -171,10 +171,10 @@ def week_analysis(team_id=None, matchupPeriod=None, stats='season', verbose=Fals
         cookies = False
 
     if cookies:
-        league = bball.League(os.environ.get('BBALL_ID'), 2023, espn_s2=cookies['espn_s2'], swid=cookies['swid'])
+        league = bball.League(os.environ.get('BBALL_ID'), 2024, espn_s2=cookies['espn_s2'], swid=cookies['swid'])
 
     if not cookies:
-        league = bball.League(os.environ.get('BBALL_ID'), 2023, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'), save_cookies=True)
+        league = bball.League(os.environ.get('BBALL_ID'), 2024, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'), save_cookies=True)
 
     if not matchupPeriod:
         matchupPeriod = league.currentMatchupPeriod

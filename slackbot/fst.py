@@ -12,7 +12,7 @@ from basketball import matchup_analysis
 client = slack.WebClient(token=os.environ.get('SLACK_TOKEN'))
 
 # also requires 'BBALL_ID', 'ESPN_USER', and 'ESPN_PW' env vars
-proj = matchup_analysis.week_analysis(stats='proj', verbose=False)
+proj = matchup_analysis.week_analysis(stats='last15', verbose=False)
 
 if datetime.datetime.now().time() < datetime.time(11):
     parent = client.chat_postMessage(
