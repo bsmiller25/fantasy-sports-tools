@@ -106,7 +106,10 @@ def matchup_projection(league, matchup, stats):
                     continue
                 if player.proTeam in sched.keys():
                     if stats in player.stats.keys():
-                        proj_stats[team]['PTS']['score'] += player.stats[stats]['avg']['PTS']
+                        try:
+                            proj_stats[team]['PTS']['score'] += player.stats[stats]['avg']['PTS']
+                        except KeyError:
+                            continue
                         proj_stats[team]['REB']['score'] += player.stats[stats]['avg']['REB']
                         proj_stats[team]['AST']['score'] += player.stats[stats]['avg']['AST']
                         proj_stats[team]['STL']['score'] += player.stats[stats]['avg']['STL']
