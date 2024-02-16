@@ -23,22 +23,22 @@ def matchup_projection(league, matchup, stats):
 
     # find the start scoring period
     
-    # pre all star        
-    if matchupPeriod < 18:
+    # pre all star       -- changed to 17 because we started late 
+    if matchupPeriod < 17:
         match_start = (2 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
                        league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1)) 
         
         match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(7))]
 
     # all star week
-    if matchupPeriod == 18:
+    if matchupPeriod == 17:
         match_start = (2 - league.start_date.weekday() + 7 * (matchupPeriod - 1),
                        league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod - 1)) 
         
         match_dates = [(match_start[0] + i, match_start[1] + timedelta(i)) for i in list(range(14))]
         
         # post all star
-    elif matchupPeriod > 18 and matchupPeriod < 20:
+    elif matchupPeriod > 17 and matchupPeriod < 20:
         match_start = (2 - league.start_date.weekday() + 7 * (matchupPeriod),
                        league.start_date - timedelta(league.start_date.weekday()) + timedelta(weeks=matchupPeriod)) 
         
