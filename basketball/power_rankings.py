@@ -21,17 +21,17 @@ def powerrankings(stats="last15"):
         cookies = False
 
     if cookies:
-        league = bball.League(os.environ.get('BBALL_ID'), 2024, espn_s2=cookies['espn_s2'], swid=cookies['swid'])
+        league = bball.League(os.environ.get('BBALL_ID'), 2025, espn_s2=cookies['espn_s2'], swid=cookies['swid'])
 
     if not cookies:
-        league = bball.League(os.environ.get('BBALL_ID'), 2024, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'), save_cookies=True)
+        league = bball.League(os.environ.get('BBALL_ID'), 2025, username=os.environ.get('ESPN_USER'), password=os.environ.get('ESPN_PW'), save_cookies=True)
 
     # get appropriate stats    
-    if stats=='last30': stats='032024'
-    if stats=='last15': stats='022024'
-    if stats=='last7': stats='012024'
-    if stats=='season': stats='002024'
-    if stats=='proj': stats='102024'
+    if stats=='last30': stats='032025'
+    if stats=='last15': stats='022025'
+    if stats=='last7': stats='012025'
+    if stats=='season': stats='002025'
+    if stats=='proj': stats='102025'
 
     lstats = {}
     for team in league.teams:
@@ -103,6 +103,7 @@ def powerrankings(stats="last15"):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--stats', '-s', help='stats', type=str, default='proj')
+    args = parser.parse_args()
 
-    print(powerrankings())
+    print(powerrankings(stats=args.stats))
     
